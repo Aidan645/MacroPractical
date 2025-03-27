@@ -4,7 +4,7 @@ from matplotlib import colormaps as cm
 import pandas as pd
 import matplotlib as mpl
 
-amounts_data = pd.read_excel("data/Diana_Badita.xlsx")
+amounts_data = pd.read_excel("data2/Calin-Mihai_Sagarceanu.xlsx")
 dd_student_name = amounts_data["Student"].values[0]
 dd_amounts_data = amounts_data[amounts_data["Student"] == dd_student_name]
 dd_polymer = dd_amounts_data["Polymer"]
@@ -66,12 +66,18 @@ class macroramanspectrum():
             if i == 0: x = df.iloc[:,i].values
             else: self.kinetic_spectra.append(ramanspectrum(x,df.iloc[:,i].values))
             
-        id = self.find_nearest_id(self.kinetic_spectra[0].x,1525)
+        
         
         # baseline
+        
+        
         for i in range(len(self.kinetic_spectra)):
-            self.kinetic_spectra[i].y -= self.kinetic_spectra[0].y[id] + ( self.kinetic_spectra[i].y[id]- self.kinetic_spectra[0].y[id]) 
-        # normalise
+            id = self.find_nearest_id(self.kinetic_spectra[i].x,1080)
+            id2 = self.find_nearest_id(self.kinetic_spectra[i].x,1770)
+            a = (-self.kinetic_spectra[i].y[id]+self.kinetic_spectra[i].y[id2])/(-self.kinetic_spectra[i].x[id]+self.kinetic_spectra[i].x[id2])
+            b = self.kinetic_spectra[i].y[id]
+            self.kinetic_spectra[i].y -= -a*(self.kinetic_spectra[0].x[id]-self.kinetic_spectra[i].x) +b
+        #normalise
         id_norm = self.find_nearest_id(self.kinetic_spectra[0].x, 1155 )
         for i in range(len(self.kinetic_spectra)):
             self.kinetic_spectra[i].y *= self.kinetic_spectra[0].y[id_norm]
@@ -107,8 +113,10 @@ class macroramanspectrum():
             self.max_id = self.find_nearest_id(cur_spec.x, max)
             self.integrals.append(np.sum(cur_spec.y[self.min_id:self.max_id]-cur_spec.y[self.max_id]))
         
+        self.integrals /= self.integrals[0]
+        
         conversion = 1-(self.integrals/self.integrals[0])
-        ax.set(ylabel = "Peak integral", xlabel = "Time [minute]", title = f"{'conversion' if c else 'reaction'} profile (using integral of peaks between 1620 and 1660 wavenumbers 1/cm)")    
+        ax.set(ylabel = f"{'Peak integral' if not c else 'Conversion Factor'}", xlabel = "Time [minute]", title = f"{'conversion' if c else 'reaction'} profile (using integral of peaks between 1620 and 1660 wavenumbers 1/cm)")    
         start = 4.4 if self.name == "B" else 0 
         if c:
             ax.plot(np.linspace(start,start+90,len(self.kinetic_spectra)),conversion, label = f"Conversion Profile of Ratio {self.name}")
@@ -145,21 +153,21 @@ class macroramanspectrum():
         pass
 
 
-fig,ax = plt.subplots(1,1, figsize = (8,8), dpi=120)
+fig,ax = plt.subplots(1,1, figsize = (7,7), dpi=90)
 
 letters = ["A","B", "C", "D", "E", "F", "G", "H", "I"]
 
-dataes = [f"data/S{letter}_kinetic.csv" for letter in letters]
+dataes = [f"data2/S{letter}_kinetic.csv" for letter in letters]
 
 
 
 def kinetic(letter):
-    macroB = macroramanspectrum(letter, kinetic_path=f"data/S{letter}_kinetic.csv")
+    macroB = macroramanspectrum(letter, kinetic_path=f"data2/S{letter}_kinetic.csv")
     macroB.display_kinetic_plot(ax)
 
 
 def thermal():
-    macrob = macroramanspectrum("B", kinetic_path="", thermal_path="data/SB_Thermal.csv")
+    macrob = macroramanspectrum("B", kinetic_path="", thermal_path="data2/SB_Thermal.csv")
     macrob.thermal_plot(ax)
     ax.set(xlim=(1530,1680))
     fig.tight_layout()
@@ -172,7 +180,7 @@ def profiles(c=False):
     ax.legend()
     
 def allthermal(ax):
-    df = pd.read_csv("data/All_120_after.csv",delimiter = ";",dtype=float,decimal=",")
+    df = pd.read_csv("data2/All_120_after.csv",delimiter = ";",dtype=float,decimal=",")
     spectra: list[ramanspectrum] = []
     for i in range(len(df.columns)):
         if i == 0: x = df.iloc[:,i]
@@ -186,20 +194,20 @@ def allthermal(ax):
     ax.legend()
     
 def single_profile():
-    macrob = macroramanspectrum("B", kinetic_path="data/SB_kinetic.csv")
-    macrob.reaction_profile_plot(ax,1620,1660,c=True)
+    macrob = macroramanspectrum("B", kinetic_path="data2/SB_kinetic.csv")
+    macrob.reaction_profile_plot(ax,1620,1660,c=False)
     ax.legend()
-    
-kinetic("B")
 
+single_profile()
 
-norm = mpl.colors.Normalize(vmin=90, vmax=0) 
+# norm = mpl.colors.Normalize(vmin=90, vmax=0) 
   
-# creating ScalarMappable 
-sm = plt.cm.ScalarMappable(cmap=plt.colormaps["viridis_r"], norm=norm) 
-sm.set_array([]) 
-plt.colorbar(sm,ax=ax,ticks=np.linspace(90, 0, 5),label = "Time [M]")
-    
+# # creating ScalarMappable 
+# sm = plt.cm.ScalarMappable(cmap=plt.colormaps["viridis_r"], norm=norm) 
+# sm.set_array([]) 
+# plt.colorbar(sm,ax=ax,ticks=np.linspace(90, 0, 5),label = "Time [M]")
+
+plt.tight_layout()
 plt.show()
     
     
