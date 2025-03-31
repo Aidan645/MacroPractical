@@ -4,7 +4,7 @@ from matplotlib import colormaps as cm
 import pandas as pd
 import matplotlib as mpl
 
-amounts_data = pd.read_excel("data2/Calin-Mihai_Sagarceanu.xlsx")
+amounts_data = pd.read_excel("data3/Agustina_German.xlsx")
 dd_student_name = amounts_data["Student"].values[0]
 dd_amounts_data = amounts_data[amounts_data["Student"] == dd_student_name]
 dd_polymer = dd_amounts_data["Polymer"]
@@ -39,8 +39,8 @@ class macroramanspectrum():
             self.data = pd.read_csv(kinetic_path,delimiter = ";",dtype=str,decimal=",")
             self.kinetic_data_process(self.data)
         if thermal_path != "" :
-            self.data2 = pd.read_csv(thermal_path,delimiter = ";",dtype=float,decimal=",")
-            self.thermal_data_process(self.data2)
+            self.data3 = pd.read_csv(thermal_path,delimiter = ";",dtype=float,decimal=",")
+            self.thermal_data_process(self.data3)
         pass    
         
     def thermal_data_process(self,dataframe):
@@ -153,21 +153,21 @@ class macroramanspectrum():
         pass
 
 
-fig,ax = plt.subplots(1,1, figsize = (7,7), dpi=90)
+fig,ax = plt.subplots(1,1, figsize = (8,8), dpi=70)
 
 letters = ["A","B", "C", "D", "E", "F", "G", "H", "I"]
 
-dataes = [f"data2/S{letter}_kinetic.csv" for letter in letters]
+dataes = [f"data3/S{letter}_kinetic.csv" for letter in letters]
 
 
 
 def kinetic(letter):
-    macroB = macroramanspectrum(letter, kinetic_path=f"data2/S{letter}_kinetic.csv")
+    macroB = macroramanspectrum(letter, kinetic_path=f"data3/S{letter}_kinetic.csv")
     macroB.display_kinetic_plot(ax)
 
 
 def thermal():
-    macrob = macroramanspectrum("B", kinetic_path="", thermal_path="data2/SB_Thermal.csv")
+    macrob = macroramanspectrum("E", kinetic_path="", thermal_path="data3/SE_Thermal.csv")
     macrob.thermal_plot(ax)
     ax.set(xlim=(1530,1680))
     fig.tight_layout()
@@ -180,7 +180,7 @@ def profiles(c=False):
     ax.legend()
     
 def allthermal(ax):
-    df = pd.read_csv("data2/All_120_after.csv",delimiter = ";",dtype=float,decimal=",")
+    df = pd.read_csv("data3/All_120_after.csv",delimiter = ";",dtype=float,decimal=",")
     spectra: list[ramanspectrum] = []
     for i in range(len(df.columns)):
         if i == 0: x = df.iloc[:,i]
@@ -194,14 +194,13 @@ def allthermal(ax):
     ax.legend()
     
 def single_profile():
-    macrob = macroramanspectrum("B", kinetic_path="data2/SB_kinetic.csv")
-    macrob.reaction_profile_plot(ax,1620,1660,c=False)
+    macrob = macroramanspectrum("E", kinetic_path="data3/SE_kinetic.csv")
+    macrob.reaction_profile_plot(ax,1620,1660,c=True)
     ax.legend()
 
 single_profile()
 
 # norm = mpl.colors.Normalize(vmin=90, vmax=0) 
-  
 # # creating ScalarMappable 
 # sm = plt.cm.ScalarMappable(cmap=plt.colormaps["viridis_r"], norm=norm) 
 # sm.set_array([]) 
