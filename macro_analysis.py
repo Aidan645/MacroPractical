@@ -10,8 +10,6 @@ dd_amounts_data = amounts_data[amounts_data["Student"] == dd_student_name]
 dd_polymer = dd_amounts_data["Polymer"]
 print(dd_polymer)
 
-
-
 class ramanspectrum():
     x = []
     y = []
@@ -26,8 +24,6 @@ class ramanspectrum():
         
         pass
     
-    
-    
 class macroramanspectrum():
     
     
@@ -39,8 +35,8 @@ class macroramanspectrum():
             self.data = pd.read_csv(kinetic_path,delimiter = ";",dtype=str,decimal=",")
             self.kinetic_data_process(self.data)
         if thermal_path != "" :
-            self.data3 = pd.read_csv(thermal_path,delimiter = ";",dtype=float,decimal=",")
-            self.thermal_data_process(self.data3)
+            self.data = pd.read_csv(thermal_path,delimiter = ";",dtype=float,decimal=",")
+            self.thermal_data_process(self.data)
         pass    
         
     def thermal_data_process(self,dataframe):
@@ -152,19 +148,15 @@ class macroramanspectrum():
         ax.set(xlabel = "Wavenumbers [1/cm]", ylabel = "Intensity [-]", title = f"Thermal Raman Spectra of Ratio {self.name}")
         pass
 
-
 fig,ax = plt.subplots(1,1, figsize = (8,8), dpi=70)
 
 letters = ["A","B", "C", "D", "E", "F", "G", "H", "I"]
 
 dataes = [f"data3/S{letter}_kinetic.csv" for letter in letters]
 
-
-
 def kinetic(letter):
     macroB = macroramanspectrum(letter, kinetic_path=f"data3/S{letter}_kinetic.csv")
     macroB.display_kinetic_plot(ax)
-
 
 def thermal():
     macrob = macroramanspectrum("E", kinetic_path="", thermal_path="data3/SE_Thermal.csv")
@@ -198,7 +190,7 @@ def single_profile():
     macrob.reaction_profile_plot(ax,1620,1660,c=True)
     ax.legend()
 
-single_profile()
+kinetic("B")
 
 # norm = mpl.colors.Normalize(vmin=90, vmax=0) 
 # # creating ScalarMappable 
